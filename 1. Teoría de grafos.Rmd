@@ -55,30 +55,25 @@ En estructuras mas complejas resulta conveniente contar con alguna herramienta d
 
 isomorphic(g1, g2)
 ```
-
-
-
-
-
 # Adyacencia
 
-## Vértives adyacentes {-}
+## Vértices adyacentes 
 
 Se dice que dos vértices $u, v \in V$ son **adyacentes** (*adjacent*), lo que se denota con $u\sim v$, si $u$ y $v$ están conectados por alguna arista de $E$.
 
 
-## Vértives asilados {-}
+## Vértices asilados 
 
 Un vértice $v\in V$ se llama **asilado** (*isolated*) si $v\not\sim u$ para todo $u\in V$.
 
 Un grafo se puede almacenar por medio de una matriz de aristas y una lista de vértices aislados. 
 
 
-## Vértices incidentes {-}
+## Vértices incidentes
 
 Un vértice $v \in V$ es **incidente** (*incident*) en una arista $e\in E$ si $e = \{v,u\}$ para algún $u\in V$. 
 
-## Grado {-}
+## Grado
 
 El **grado** (*degree*) del vértice $v\in V$ se define como el número de aristas incidentes en $v$.
 
