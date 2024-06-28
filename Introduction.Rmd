@@ -1,0 +1,255 @@
+---
+title: "Introduction"
+output: html_document
+date: "2024-06-28"
+---
+
+## Redes sociales
+
+Una **red social** o simplemente *red* es una colección de objetos interconectados.
+
+Un grafo $G = (V,E)$ es una estructura que consiste de un conjunto de *vértices* (nodos) $V$ y de un conjunto de *aristas* (enlaces o arcos) o *edges* $E$, que permiten representar relaciones entre los elementos del conjunto, donde los elementos de $E$ son parejas de la forma $e = {u,v}$ con $u, v \in V$.
+
+El número de vértices y el número de aristas se conocen **como orden** y **tamaño del grafo**, respectivamente. 
+
+Comúnmente, los **vértices** del grafo se enumeran con los números enteros 1:n con $n = |V|$
+
+Dos gráfos que son **equivalentes en su estructura** a pesar de a enumeración de los vértices se denominan **isomorfos**. 
+
+> Dos gráfos son **isomorfos** cuando tienen la misma estructura, es decir, si el orden y el tamaño del gráco coinciden, sin importar si las relaciones son diferentes en términos de la enumeración.
+
+Un grafo $H = (V',E')$ es un **subgrafo** de $G = (V,E)$ si $V' \subset V$ y $E' \subset E$.
+
+Un gráfo para el que cada arista $\{u,v\} \in E$ es tal que $\{u,v\} \neq \{v,u\} \forall u,v \in V$ se denomina grafo dirigido o digrafo. De los contrario se llama grafo **no dirigido**. 
+>Por defecto, el término grafo hacer referencia a un **grafo no dirigido** .
+
+Un **Multigrafo** es aquel que permite múltiples aristas entre el mismo par de vértices y aristas de un vértice a sí mismo. Un grafo que no es un multigrafo se llama **grafo simple**.
+
+Las redes se construyen sobre **datos relacionales**. La presencia de **variables diádicas** (medidas sobre pares de individuos o díadas) es la característica distintiva de estos datos.
+
+## Tipos de relaciones
+
+### Dirigidas y no dirigidas
+
+Una relación **no dirigida** o simétrica, tiene uno y sólo un valor por díada. Por otro lado, una relación dirigída, asimétrica, tiene dos valores por díada, un valor que representa la perspectiva de cada miembro de la pareja.
+
+Se dice que una red es una red no dirigida si todas las relaciones en ella no están dirigidas, y se denomina red dirigida o dígrafo en caso contrario.
+
+### Binarias y ponderadas
+
+
+Una relación **binaria** (dicotómica) únicamente asume dos valores, ausencia o presencia de la relación. 
+
+Una relación **ponderada** (numérica) toma más de dos valores para caracterizar las relaciones entre las díadas.
+
+
+## Representación con gráfos
+
+Un **grafo** por sí solo (una colección de vértices y aristas) suele ser insuficiente para representar todos los atributos una red.
+
+La **decoración** de un grafo corresponde a la **conjunción de vértices y aristas con otras variables** de interés (atributos).
+
+La **teoría de grafos** es fundamental para analizar redes sociales.
+
+## Ejemplo de grafo no dirigido
+
+Empezaremos por definir manualmente el orden y el tamaño de un grafo arbitrario
+
+Procedemos a importat la librería de trabajo y crear nuestro grafo no dirigido. Revisamos a clase del objeto.
+
+```{r}
+# install.packages("igraph")
+suppressMessages(suppressWarnings(library(igraph)))
+# red binaria no dirigida
+g <- graph_from_literal(1-2, 1-3, 2-3, 2-4, 3-5, 4-5, 4-6, 4-7, 5-6, 6-7)
+
+# otra manera mas cómoda pero menos visual
+# g <- graph(edges = c(1,2, 1,3, 2,3, 2,4, 3,5, 4,5, 4,6, 4,7, 5,6, 6,7), directed = FALSE)
+
+class(g)
+# graph_id(g) #Esto nos permite ver el ID
+
+```
+
+Para visualizar los vértices podemos usar la función *V()*, también podemos ver el orden del gráfo con *vcount()*
+
+```{r}
+V(g) # vertices
+vcount(g) # Grafo de orden 7
+```
+Lo mismo podemos hacer con respecto a las aristas, en este caso con *E()* y el tamaño con *ecount()*
+
+```{r}
+E(g)
+ecount(g)
+```
+Incluso podemos ver las relaciones entre los nodos de manera integral, en este caso se emula el diagrama de tallos y hojas de Tukey. Es facil ver, con este gráfico, la popularidad de los gráfos.
+
+```{r}
+print_all(g)
+```
+Podemos revisar si la red es o no ponderada o no, o si la red es simple o multigrafo.
+
+```{r}
+is_weighted(g)
+is_simple(g)
+```
+Finalmente, podemos representarlo visualmente con la función *plot()*
+
+```{r}
+plot(g)
+```
+La documentación del paquete se encuentra en el siguiente enlace: (https://igraph.org/)
+
+## Red ponderada
+
+Habiendo definido el objeto, puedo manualmente ponderar los enlaces:
+
+```{r}
+# red ponderada no dirigida
+wg <- g
+E(wg)$weight <- round(runif(n = ecount(wg)), 3) #Lo doy de manera aleatorio
+
+E(wg)$weight
+is_weighted(wg) #Pregunta de si es ponderada
+```
+Por supuesto, también podemos graficarla
+
+```{r}
+# visualización
+set.seed(123)
+plot(wg, edge.width = 5*E(wg)$weight, main = "Red ponderada no dirigida")
+```
+También podemos revisar digrafos o grafos dirigidos
+
+```{r}
+# red binaria dirigida
+dg <- graph_from_literal(1-+2, 1-+3, 2++3)
+
+# aristas
+E(dg)
+
+# etiquetas
+V(dg)$name <- c("Juan", "Maria", "Pedro")
+# agregar 'sexo' como atributo
+V(dg)$sexo <- c("M","F","M")
+# aristas
+E(dg)
+
+```
+Veamos la representación gráfica
+
+```{r, fig.height = 5, fig.width = 5, fig.align = 'center'}
+# visualización
+set.seed(123)
+plot(dg, vertex.size = 35, main = "Red binaria dirigida")
+```
+Finalmente, podemos graficar multigráfos
+
+```{r}
+# multigrafo
+mg <- g + edge(c(1,1), c(1,2), c(1,3))
+print_all(mg)
+# simple?
+is_simple(mg)
+```
+Veamos los gráficos
+
+```{r}
+plot(mg)
+```
+## Estructuras de datos relacionales
+
+Generalmente los grafos no se definen manualmente ya que la mayoría de las redes en la práctica son grandes. Los datos para construir un grafo tipicamente se almacenarán en un **archivo de datos**.
+
+### Matriz de adyacencia
+
+La matriz de adyacencia $Y = [y_{i,j}]$ asociada con un grafo  binario $G = (V,E)$ con $n$ vértices es una *matriz binaria* de $nxn$ tal que $y_{i,j} = 1$ si $\{i,j\}\in E$ y  $y_{i,j} = 0$ en otro caso. 
+
+La **diagonal principal** de una matriz adyacente está llena de **ceros estructurales**.
+
+La matriz de adyacencia de un gráfo no dirigido es necesariamente simétrica. Mientras que la matriz de adyacencia de un grafo dirigido es posiblemente asimétrica.
+
+```{r}
+print('Rutina con la librería igraph()')
+as_adj(g) # parte del paquete igraph()
+
+print('Rutina con la librería base')
+as_adjacency_matrix(g) # paquete base de R
+```
+Podríamos cambiar el formato de la gráfica para poder manipularla con una matriz de R
+
+```{r}
+Y <- as.matrix(as_adj(g))
+print(Y)
+```
+Ecnetualmente podríamos tener unteres en trabajar con una versión vectorizada, en la que podemos tomar sólo los valores superiores o inferiores, evitando así la duplicidad que genera la simetría de la matriz. Esto puede ser útil en términos de optimizar procesamiento computacional. A continuación, tomamos la parte inferior de la matriz
+
+```{r}
+vY <- Y[lower.tri(Y)]
+vY
+```
+## Lista de aristas (Edge List)
+
+Una lista, o matriz, de aristas, *edge list*, es una arreglo de dos columnas conformado por todo los pares de vértices que están unidos por una arista. Esto significa que la matriz o lista tendrá tantas filas como conexiones posea. Veamos esto con un ejercicio práctico.
+
+
+## Ejercicio práctico
+
+Red de **relaciones de trabajo colaborativo**. Estos datos fueron recolectados para **estudiar la cooperación** entre los actores de una firma de abogados.
+
+Fuente: Lazega, E. (2001). **The collegial phenomenon: The social mechanisms of cooperation among peers in a corporate law partnership**. Oxford University Press on Demand.
+
+Empecemos por traer la librería y ver la información de las unidades estadísticas de análisis
+
+```{r}
+# install.packages("sand")
+suppressMessages(suppressWarnings(library(sand)))
+
+head(v.attr.lazega) # atributos
+```
+Veamos ahora las relaciones a través de las lista de aristas o relaciones. El objeto nos muestra
+
+```{r}
+head(elist.lazega)
+dim(elist.lazega) # 115 relaciones
+
+```
+A partir de de la matriz de aristas podemos construir un grafo usando la función *graph_from_data_frame()*. Esta función 
+
+```{r}
+# grafo
+g_lazega <- graph_from_data_frame(d = elist.lazega, directed = "F", vertices = v.attr.lazega)
+
+V(g_lazega)$name <- 1:vcount(g_lazega) #asignación de nombres
+```
+
+También podriamos obtener la matriz de adyacencia a partir de la matriz de aristas. No obstante la graficaremos censurada, dado que la matriz es de orden 36, lo que nos daría una matriz 36x36.
+
+```{r}
+vcount(g_lazega) #Orden 36
+ecount(g_lazega) # tamaño
+```
+
+```{r}
+Y_lazega <- get.adjacency(g_lazega, sparse = F)
+Y_lazega[0:10,0:10] #Censuro la matriz para no mostrarla toda
+
+```
+Vamos a visualizar el grafo a la vez que se presenta una forma alternativa de presentar la matriz de adyacencia:
+
+#### Grafo
+
+```{r}
+plot(g_lazega, main = "Grafo Lazega", vertex.size = 15, edge.color = 'gray50', vertex.frame.color = .2)
+```
+#### MAtriz de adyacencia
+
+```{r}
+
+library(corrplot)
+
+corrplot::corrplot(corr = Y_lazega, method = "color", tl.col = "black", addgrid.col = "gray90", cl.pos = "n")
+```
+
+
