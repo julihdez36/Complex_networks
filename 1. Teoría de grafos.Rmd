@@ -1,21 +1,23 @@
 ---
 title: "1. Teoría de grafos"
 output: html_document
-date: "2024-06-28"
+date: ""
 ---
 
 # Conceptos fundamentales de teoría de grafos
 
+---
+
 # Grafos y subgrafos
 
-## Grafos {-}
+Un **grafo** $G = (V, E)$ es una estructura que que se compone por un conjunto de **vértices** (nodos) $V$ y de un conjunto de **aristas** (enlaces o *edge*) $E$, donde los elementos de $E$ son parejas de la forma $e=\{u,v\}$, con $u,v\in V$. 
 
-Un **grafo** $G = (V, E)$ es una estructura que consiste de un conjunto de **vértices** (nodos) $V$ y de un conjunto de **aristas** (enlaces) $E$, donde los elementos de $E$ son parejas de la forma $e=\{u,v\}$, con $u,v\in V$. 
 
-## Subgrafos {-}
+> Los grafos son el objeto matemático que usamos para representar las redes complejas. 
 
-Un grafo $G'=(V',E')$ es un **subgrafo** de $G=(V,E)$ si $V'\subset V$ y $E'\subset E$.
+Decimos que un grafo $G'=(V',E')$ es un **subgrafo** de $G=(V,E)$ si $V'\subset V$ y $E'\subset E$.
 
+---
 
 # Isomorfismo
 
@@ -30,9 +32,7 @@ Si $|V_1| \neq |V_2|$ o $|E_1| \neq |E_2|$, entonces $G_1 \not\equiv G_2$.
 
 Si $G_1 \equiv G_2$ y $\{u,v\}\notin E_1$, entonces $\{\varphi(u),\varphi(v)\}\notin E_2$.
 
-## Ejemplo
-
-Consideremos dos grafos arbitrarios y evaluemos si son isomorfos
+Para ilustrar la definición, consideremos dos grafos arbitrarios y evaluemos si son *isomorfos*
 
 ```{r}
 suppressMessages(suppressWarnings(library(igraph)))
@@ -50,141 +50,99 @@ par(mfrow = c(1,2))
 plot(g1, vertex.size = 15, main = "Grafo 1")
 plot(g2, vertex.size = 15, main = "Grafo 2", layout = layout_as_star)
 ```
-En estructuras mas complejas resulta conveniente contar con alguna herramienta de evaluación de isomofismo, lo que nos proporciona la función *isomorphic()*
+En estructuras mas complejas resulta conveniente contar con alguna herramienta de evaluación de isomofismo, lo que nos proporciona la función *isomorphic()* la cual nos da como salida un valor lógico o booleano.
+
 ```{r}
 
 isomorphic(g1, g2)
 ```
-# Adyacencia
 
-## Vértices adyacentes 
+---
+
+# Adyacencia
 
 Se dice que dos vértices $u, v \in V$ son **adyacentes** (*adjacent*), lo que se denota con $u\sim v$, si $u$ y $v$ están conectados por alguna arista de $E$.
 
+Para valorar la adyacencia tomemos un grafo arbitrario y valoremos los vecinos del vertice 1, que en este caso son los vertices 2 y 3.
 
-## Vértices asilados 
+```{r}
 
-Un vértice $v\in V$ se llama **asilado** (*isolated*) si $v\not\sim u$ para todo $u\in V$.
+g <- graph(edges = c(1,2, 1,3, 2,3, 2,4, 3,5, 4,5, 4,6, 4,7, 5,6, 6,7), directed = FALSE)
 
-Un grafo se puede almacenar por medio de una matriz de aristas y una lista de vértices aislados. 
+neighbors(graph = g,v = 1)
+```
+Por su parte, un vértice $v\in V$ se llama **asilado** (*isolated*) si $v\not\sim u$ para todo $u\in V$, es deci, si no es adyacente a ningún otro nodo. De esto podemos inferir que Un grafo se puede almacenar por medio de una matriz de aristas (que muestra todos enlaces) y una lista de vértices aislados. 
 
+Finalmente, un vértice $v \in V$ es **incidente** (*incident*) en una arista $e\in E$ si $e = \{v,u\}$ para algún $u\in V$. 
 
-## Vértices incidentes
+## Grado de un grafo
 
-Un vértice $v \in V$ es **incidente** (*incident*) en una arista $e\in E$ si $e = \{v,u\}$ para algún $u\in V$. 
+El **grado** (*degree*) de un vértice $v\in V$ se define como el número de aristas incidentes en $v$. En nuestro caso, con un grafo no dirigido, podemos ver el grado de cada vértice evaluando sus vértices incidentes con la función  *degree()*. Nótese que podriamos valorar los vértices incidentes por cada vector con la función de vecindad *neighbors()*.
 
-## Grado
+```{r, fig.align='center'}
+neighbors(graph = g, v = 4)
+degree(graph = g)
+```
+Es interesante notar que el grado de los vectores nos ofrecen una **distribución de masa de probabildad** (que usamos para variables discretas), que denominaremos *distribución de grado*, el cual es de las primeras caracteristicas que valoramos al estudiar grafos. 
 
-El **grado** (*degree*) del vértice $v\in V$ se define como el número de aristas incidentes en $v$.
+> Por lo general, la distribución de **grado de un grafo** siguen patrones particulares que estudiaremos mas adelante. 
+
 
 Para dígrafos, el **grado de entrada** (*in-degree*) y el **grado de salida** (*out-degree*) del vértice $v\in V$ se definen como el número de aristas que apuntan hacia dentro y hacia fuera de $v$, respectivamente.
 
 
-## Ejemplo
-
-```{r, fig.align='center'}
-# red no dirigida
-g <- graph_from_literal(1-2, 1-3, 2-3, 2-4, 3-5, 4-5, 4-6, 4-7, 5-6, 6-7)
-```
-
-
-```{r, fig.height = 5, fig.width = 5, fig.align = 'center'}
-# visualización
-set.seed(123)
-plot(g)
-```
-
-
-```{r}
-# vecinos del vértice 1
-neighbors(graph = g, v = 1)
-```
-
-
-```{r}
-# grados
-degree(graph = g)
-```
-
-
-## Ejemplo
-
 ```{r, fig.align='center'}
 # red dirigida
 dg <- graph_from_literal(1-+2, 1-+3, 2++3)
-```
 
-
-```{r, fig.height = 5, fig.width = 5, fig.align = 'center'}
-# visualización
 set.seed(123)
 plot(dg)
 ```
 
+Veamos ahora los grados de entrada y de salida de cada vértice
 
 ```{r}
-# grado de entrada
-degree(graph = dg, mode = "in")
-# grado de salida
-degree(graph = dg, mode = "out")
+print("Grado de entrada"); degree(graph = dg, mode = "in")
+
+print("Grado de salida"); degree(graph = dg, mode = "out")
 ```
 
+## Movimiento de un gráfo
 
-# Movimiento
+Una **caminata** (*walk*) de $v_0$ a $v_\ell$ de longitud $\ell$ es una secuencia alternante de vertices $v_i$ y enlaces $e_i$ $\{v_0,e_1,v_1,e_2,v_2,\ldots,v_{\ell-1},e_\ell,v_\ell\}$ en la que los puntos extremos de $e_i$ son $\{v_{i-1}, v_i\}$, con $i=1,\ldots,\ell$ (se pueden repetir vértices y aristas) se dice que la longitud de esta caminata es $\ell$. Puede haber caminatas abiertas o cerradas. 
 
-## Caminata  {-}
-
-Una **caminata** (*walk*) de $v_0$ a $v_\ell$ de longitud $\ell$ es una secuencia alternante $\{v_0,e_1,v_1,e_2,v_2,\ldots,v_{\ell-1},e_\ell,v_\ell\}$ en la que los puntos extremos de $e_i$ son $\{v_{i-1}, v_i\}$, con $i=1,\ldots,\ell$ (se pueden repetir vértices y aristas). 
-
-- $1\rightarrow 2\rightarrow 3\rightarrow 4\rightarrow 3\,$              es una **caminata abierta**. 
+- $1\rightarrow 2\rightarrow 3\rightarrow 4\rightarrow 3\,$ es una **caminata abierta**, dado que el vértice de inicio no coincide con el final.
 - $1\rightarrow 2\rightarrow 3\rightarrow 4\rightarrow 3\rightarrow 1\,$ es una **caminata cerrada**.
 
-
-
-## Sendero {-}
 
 Un **sendero** (*trail*) es una caminata abierta sin aristas repetidas (se pueden repetir vértices).
 
 - $1\rightarrow 3\rightarrow 8\rightarrow 6\rightarrow 3\rightarrow 2\,$ es un **sendero**. 
 
 
-
-## Circuito {-}
-
 Un **circuito** (*circuit*) es una caminata cerrada sin aristas repetidas (se pueden repetir vértices). 
 
 - $1\rightarrow 2\rightarrow 4\rightarrow 3\rightarrow 6\rightarrow 8\rightarrow 3\rightarrow 1\,$ es un **circuito**.
 
-
-
-
-## Ciclo {-}
 
 Un **ciclo** (*cycle*) es una caminata cerrada con al menos tres aristas no repetidas y vértices intermedios distintos.
 
 - $1\rightarrow 2\rightarrow 4\rightarrow 3\rightarrow 1\,$ es un ciclo. 
 
 
-
 Los grafos que no contienen ciclos se denominan **acíclicos** (*acycle*).
 
 
-# Conectividad
+## Conectividad y componentes
 
 Se dice que un vértice $v$ es **accesible** (*reachable*) desde otro vértice $u$ si existe una caminata desde $u$ hasta $v$. 
 
 Se dice que un grafo está **conectado** (*connected*) si cada vértice es accesible desde todos los demás. 
 
 
-## Ejemplo: grafos conectados con 5 vértices
-
-
-
-
 Una **componente** (*component*) de un grafo es un subgrafo conectado maximalmente, i.e., un subgrafo al que añadirle cualquier otro vértice arruina la conectividad.
 
-
-## Ejemplo
+Veamos un ejemplo con un grafo de tres componentes
 
 ```{r}
 # red no dirigida
@@ -198,38 +156,39 @@ set.seed(123)
 plot(g)
 ```
 
+Nos preguntamos si el grafo está conectado *(connected)*, es decir, si todos los vértices están conectads. Lo que sabemos que no es cierto.
 
 ```{r}
 # conectado?
 is_connected(g)
 ```
+Habiendo definido que nuestro grafo no está conectado, preguntemonos por el número de componentes. Con la rutina *clusters()* aparecen tres mensajes:
 
+1. A qué componente pertenece cada vector
+1. Tamaño de cada uno de los componentes
+1. Cuántos componentes existen
 
 ```{r}
 # componentes
 clusters(g)
 ```
-
+Para el caso de grafos dirigidos tenemos dos tipos de conectividad.
 
 Un digrafo está **conectado débilmente**  (*weakly connected*)   si el grafo subyacente (resultado de remover la direccionalidad) está conectado.
 
 Un digrafo está **conectado fuertemente** (*strongly connected*) si cada vértice es accesible desde todos los demás mediante una caminata dirigida.
 
 
-## Ejemplo
+Consideremos un digrafo arbitrario de tres vértices
 
 ```{r, fig.align='center'}
 # red dirigida
 dg <- graph_from_literal(1-+2, 1-+3, 2++3)
-```
-
-
-```{r, fig.height = 5, fig.width = 5, fig.align = 'center'}
-# visualización
 set.seed(123)
 plot(dg)
 ```
 
+Como podemos ver, no podemos llegar a todos los vértices $v_i$ partiendo de un vértice arbitrario $v$. Por ejemplo, desde $v_3$ no puedo llegar a $v_1$. En este sentido, el digrafo tiene una conectividad debil y carece de una conectividad fuerte.
 
 ```{r}
 # conectado débilmente?
@@ -243,80 +202,70 @@ is_connected(graph = dg, mode = "strong")
 ```
 
 
-# Distancia
+# Distancia geodésica
 
-La **distancia geodésica** entre dos vértices de un grafo es la longitud de la caminata más corta entre los vértices. 
-
-La distancia se define como infinito si no existen caminatas entre los vértices.
-
-El valor de la distancia más grande de un grafo se llama **diámetro** del grafo.
+La **distancia geodésica** entre dos vértices de un grafo es la longitud de la caminata más corta entre los vértices. La distancia se define como infinito si no existen caminatas entre los vértices. El valor de la distancia más grande de un grafo se llama **diámetro** del grafo.
 
 La **distancia geodésica promedio** es una medida del grado de separación de los vértices.
 
-## Ejemplo
-
-```{r, fig.align='center'}
-# red no dirigida
-g <- graph_from_literal(1-2, 1-3, 2-3, 2-4, 3-5, 4-5, 4-6, 4-7, 5-6, 6-7)
-```
-
+Tomemos un grafo conectado de 7 vertices y 10 aristas.
 
 ```{r, fig.height = 5, fig.width = 5, fig.align = 'center'}
-# visualización
+# red no dirigida
+g <- graph_from_literal(1-2, 1-3, 2-3, 2-4, 3-5, 4-5, 4-6, 4-7, 5-6, 6-7)
 set.seed(123)
 plot(g)
 ```
 
+Preguntemonos por la distancia geodésica del gráfo entre el $v_1$ y $v_7$
 
 ```{r}
 # distancia
-distances(graph = g, v = 1, to = 6)
+distances(graph = g, v = 1, to = 7) #numero de aristas en la ruta mas corta
 ```
 
+Veamos también la caminata desde $v_1$ a $v_7$
 
 ```{r}
 # caminata
-shortest_paths(graph = g, from = 1, to = 6)$vpath
+shortest_paths(graph = g, from = 1, to = 7)$vpath #vertices por los que pasa
 ```
-
+Puedo también preguntar por la diferentes caminatas posibles entre uno punto y otro 
 
 ```{r}
 # caminatas
 all_shortest_paths(graph = g, from = 1, to = 6)$res
 ```
-
+También podemos considerar una matriz que muestre la distancia geodésica entre todos los vértices
 
 ```{r}
 # distancias
-(D <- distances(graph = g, v = V(g), to = V(g)))
+D <- distances(graph = g, v = V(g), to = V(g))
+D
 ```
-
+Veamos ahora el diametro, que definimos como el valor de la distancia más grande de un grafo
 
 ```{r}
 # diámetro
 diameter(g)
 ```
-
-
-```{r}
-# diámetro (otra manera)
-max(D[lower.tri(D)])
-```
+También podemos ver el sendero de nuestro diametro
 
 
 ```{r}
 # sendero del diámetro
-(d <- get_diameter(g))
+d <- get_diameter(g)
+d
 ```
-
+Finalmente podemos visualizar el grafo coloreando el sendero del diametro del gráfo
 
 ```{r, fig.height = 5, fig.width = 5, fig.align = 'center'}
 # visualización del diámetro
 V(g)$color <- "white"
 E(g)$color <- "grey"
 E(g)$width <- 1
-V(g)[d]$color <- "royalblue"
-E(g, path = d)$color <- "royalblue"
+V(g)[d]$color <- "orange"
+E(g, path = d)$color <- "orange"
 E(g, path = d)$width <- 2
 set.seed(123)
 plot(g)

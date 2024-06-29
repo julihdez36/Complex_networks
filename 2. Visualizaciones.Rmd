@@ -1,0 +1,15 @@
+---
+title: "2. Visualizaciones"
+output: html_document
+date: "2024-06-29"
+---
+
+La visualización de un grafo $G=(V,E)$ consiste en **crear representaciones geométricas de grafos** utilizando **símbolos** para los vértices $v \in V$ y **curvas suaves** para las aristas $e \in E$.
+
+Los grafos de tamaño no trivial deben dibujarse utilizando **métodos automatizados**.
+
+Se usan algoritmos que solucionan los **problemas de optimización** derivados del propósito de la representación automática.
+
+Los diseños buscan minimizar las superposiciones de vértices y el cruce de aristas.
+
+
