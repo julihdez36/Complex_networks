@@ -1,0 +1,31 @@
+---
+title: "Caracterización de vértices"
+output: html_document
+date: ""
+---
+Las preguntas de interés se pueden formular en términos de algún aspecto de las componentes o de la estructura de la red
+
+- **Importancia de individuos**.
+- Dinámicas sociales.
+- Flujo de la información.
+- Formación de comunidades.
+
+Lo primero que haremos para caracterizar el vértice es evaluar el grado de un vértice.
+
+El **grado** (*degree*) $d_v$ de un vértice $v\in V$ se define como $d_v = |\left\{\{v,u\}\in E:u\in V \right\}|$, i.e., $d_v$ corresponde al número de aristas incidentes en $v$. 
+
+A partir de la **matriz de adyacencia** $\mathbf{Y}=[y_{i,j}]$ se tiene que el grado del individuo $i$ se puede calcular mediante
+
+$$
+d_i = \sum_{i:i\neq j} y_{i,j} = \sum_{j:j \neq i} y_{i,j}\,,\qquad \text{para}\,\,i=1,\ldots,n\,.
+$$
+
+El grado de un vértice es la combinación de la **sociabilidad** y la **popularidad**.
+
+¿Cómo se adaptan estos conceptos en el caso de los **digrafos**?
+
+En redes ponderadas, la **fuerza** (*strength*) $s_v$ de un vértice $v\in V$ se define como 
+$$
+s_v = \sum_{u\in V:\{v,u\}\in E} w_{\{v,u\}}\,,
+$$
+i.e., la suma de los pesos de las aristas incidentes en $v$. 

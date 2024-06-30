@@ -187,3 +187,4 @@ for (layout in layouts) {
   plot(net, edge.arrow.mode=0, layout=l, main=layout) }
 
 # https://kateto.net/network-visualization
+
