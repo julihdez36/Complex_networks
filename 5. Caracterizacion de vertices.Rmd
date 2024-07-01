@@ -22,10 +22,93 @@ $$
 
 El grado de un vértice es la combinación de la **sociabilidad** y la **popularidad**.
 
-¿Cómo se adaptan estos conceptos en el caso de los **digrafos**?
-
 En redes ponderadas, la **fuerza** (*strength*) $s_v$ de un vértice $v\in V$ se define como 
 $$
 s_v = \sum_{u\in V:\{v,u\}\in E} w_{\{v,u\}}\,,
 $$
 i.e., la suma de los pesos de las aristas incidentes en $v$. 
+
+# Distribución del grado
+
+La **distribución del grado** (degree distribution) de **G** es la colección de frecuencias relativas $f_{0},f_{1}...$ donde
+
+$$f_{d} = \frac{|\{v \in V : d_{v} = d\}|}{|V|}$$
+
+Usualmente esta distribución tiene un **sesgo positivo** o decaimiento, lo que podriamos definir como un hecho estilizado para diferentes grafos.
+
+Si estoy trabajando con una red dirigida debemos definir dos distirbuciones de frecuencia, *in* y *out*. En estos casos, podemos realizar un *gráfico de dispersión* *(out,in)* que nos arroja información valiosa. 
+
+Para redes ponderadas hacemos uso de la **distribución de fuerza** (strenght distribution), la cual se define de manera análoga.
+
+# Aplicaciones
+
+# Ejemplo Zachary.
+# Los nodos representan a los miembros de un club de karate 
+# Los enlaces indican interacciones sociales entre los miembros
+
+```{r}
+suppressMessages(suppressWarnings(library(sand)))
+data(karate)
+
+vcount(karate) # Orden del grafo
+
+ecount(karate) # Tamaño
+
+is_directed(karate) # No es dirigida
+is_weighted(karate) # Es ponderada (importancia relativa entre alumnos y lideres de la escuela)
+```
+Con esta información general, revisemos los grados y grafiquemos la *distribución del grado*
+
+
+```{r}
+n <- vcount(karate)
+d <- degree(karate)
+
+par(mfrow = c(1,2))
+plot(table(factor(d,levels = 0:n))/n, lwd = 4, ylim = c(0,0.5),xlab = 'Grado',ylab = 'Densidad',xaxt = 'n', col = 'gray50')
+hist(d, freq = F, col = 'gray90',border = 'gray50')
+
+title(main = 'Distribución de grado', outer = T, line = -2)
+```
+
+La asimetría positiva se ve reflejada en la distirbución de grado de nuestro ejemplo. También es posible ver que no hay nodos aislados (no hay vertices con grado 0). TAmpobo hay ninguno que tenga una conectividad total. También es posible ver que hay como tres categorías de grupos: (1) entre 16 y 17, (2) entre 9 y 13, (3) entre 1 y 6.
+
+Dado que esta red es ponderada, podriamos ajustar el gráfico por las ponderaciones
+
+```{r}
+par(mfrow = c(1,2))
+wd <- strength(karate)
+barplot(table(wd), xlim = c(0,35))
+hist(wd, freq = F)
+```
+
+# EJemplo 2: Yeast
+# interacciones entre poteinas que tienen una confianza alta y media.
+
+```{r}
+suppressMessages(suppressWarnings(library(sand)))
+
+data(yeast) # datos
+vcount(yeast) # Orden
+ecount(yeast) # Tamaño
+is_directed(yeast)
+is_weighted(yeast)
+```
+# Análisis de grado
+
+```{r}
+d <- degree(yeast)
+
+# Distribución de grado
+
+dd <- degree_distribution(yeast)
+
+# Gráfico
+par(mfrow = c(1,2))
+hist(d, freq = F)
+plot(log(dd))
+```
+Power low distribution. Refiere al comportamiento logaritmico de la función de densidad de masa de la dsitribución del grado.
+Cuando sigue este comportamiento la red sigue un comportamiento 'scale free'. La importancia de regularizar esta distribución del grado tiene que ver con que es un patrón muy común en los fenómenos analizados. 
+
+Lo que estamos viendo es que en escala logaritmica la densidad del grado es linealmente decreciente. 

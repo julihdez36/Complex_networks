@@ -10,9 +10,8 @@
 
 
 
-<meta name="date" content="2024-06-30" />
 
-<title>5. Caracterización de vértices</title>
+<title>Caracterización de vértices</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -349,8 +348,7 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">5. Caracterización de vértices</h1>
-<h4 class="date">2024-06-30</h4>
+<h1 class="title toc-ignore">Caracterización de vértices</h1>
 
 </div>
 
@@ -363,14 +361,15 @@ aspecto de las componentes o de la estructura de la red</p>
 <li>Flujo de la información.</li>
 <li>Formación de comunidades.</li>
 </ul>
-<div id="grado-y-fuerza" class="section level1">
-<h1>Grado y fuerza</h1>
+<p>Lo primero que haremos para caracterizar el vértice es evaluar el
+grado de un vértice.</p>
 <p>El <strong>grado</strong> (<em>degree</em>) <span class="math inline">\(d_v\)</span> de un vértice <span class="math inline">\(v\in V\)</span> se define como <span class="math inline">\(d_v = |\left\{\{v,u\}\in E:u\in V
 \right\}|\)</span>, i.e., <span class="math inline">\(d_v\)</span>
 corresponde al número de aristas incidentes en <span class="math inline">\(v\)</span>.</p>
 <p>A partir de la <strong>matriz de adyacencia</strong> <span class="math inline">\(\mathbf{Y}=[y_{i,j}]\)</span> se tiene que el
 grado del individuo <span class="math inline">\(i\)</span> se puede
-calcular mediante <span class="math display">\[
+calcular mediante</p>
+<p><span class="math display">\[
 d_i = \sum_{i:i\neq j} y_{i,j} = \sum_{j:j \neq i} y_{i,j}\,,\qquad
 \text{para}\,\,i=1,\ldots,n\,.
 \]</span></p>
@@ -382,7 +381,6 @@ d_i = \sum_{i:i\neq j} y_{i,j} = \sum_{j:j \neq i} y_{i,j}\,,\qquad
 <span class="math inline">\(s_v\)</span> de un vértice <span class="math inline">\(v\in V\)</span> se define como <span class="math display">\[
 s_v = \sum_{u\in V:\{v,u\}\in E} w_{\{v,u\}}\,,
 \]</span> i.e., la suma de los pesos de las aristas incidentes en <span class="math inline">\(v\)</span>.</p>
-</div>
 
 
 

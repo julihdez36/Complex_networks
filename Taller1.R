@@ -81,21 +81,104 @@ degree(graph = g, v = V(g)) #Grado de todos los vértices
 nodos_subgrafo <- c(1, 2, 3, 4)
 
 subgrafo <- induced_subgraph(g, nodos_subgrafo) # Obtener el subgrafo
+set.seed(123)
 
 plot(subgrafo)
 
 
 # Punto 3 -----------------------------------------------------------------
 
-# Triada o tripleta
-# Una tríada es un conjunto de tres nodos conectados por tres aristas
-# El censo de una tríada se define como el número de subgrafos cerrados
-# de tamaño tres que contienen la tríada.
+# Consideramos un digrafo G(V,E) con los siguientes edges
 
+enla3 <- c(1,3,2,3,2,4,2,5,3,1,3,5,4,5,5,4)
+
+# Lo convertimos en un grafo
+g3 <- graph(edges = enla3,directed = T)
+
+# Lo visualizamos 
+set.seed(123)
+plot(g3)
+
+# Orden, tamaño y diámetro del gráfo
+
+sprintf('El orden del gráfo es de %d', vcount(g3)) # 5
+sprintf('El tamaño del gráfo es de %d', ecount(g3)) # 8
+sprintf('El diametro del gráfo es %d', diameter(g3)) # 3
+
+# Grado de cada vértice
+
+degree(graph = g3, v = V(g3), mode = 'in') #Grados de entrada
+degree(graph = g3, v = V(g3), mode = 'out')  #Grados de salida
+
+# Graficar subgrafo generado por los nodos 1,2,3 y 4
+
+nodos_subgrafo <- c(1, 2, 3, 4)
+
+subgrafo3 <- induced_subgraph(g3, nodos_subgrafo) # Obtener el subgrafo
+set.seed(123)
+plot(subgrafo3)
 
 
 # Punto 4 -----------------------------------------------------------------
 
-# Graficar todos los grafos conectados con 4 vértices.
+# Empecemos por graficar la triada; para ello, definamosla
 
-components(g)
+# Triada o tripleta
+# Una tríada es un conjunto de tres vertices
+
+# Estados triádicos dirigidos
+
+# Cuántaos estádos triadicos no dirigidos puede haber? 2^3 = 8
+# Ninguna, una, dos o tres aristas
+
+# Definamos vertices
+
+vertices <- c("v1", "v2", "v3")
+
+# Generemos una lista con el número de aristas posibles por cada grafo
+
+edgelists <- list(
+  c(),                   # Ninguna arista
+  c("v1", "v2"),         # Una arista (v1 - v2)
+  c("v1", "v3"),         # Una arista (v1 - v3)
+  c("v2", "v3"),         # Una arista (v2 - v3)
+  c("v1", "v2", "v1", "v3"),   # Dos aristas (v1 - v2, v1 - v3)
+  c("v1", "v2", "v2", "v3"),   # Dos aristas (v1 - v2, v2 - v3)
+  c("v1", "v3", "v2", "v3"),   # Dos aristas (v1 - v3, v2 - v3)
+  c("v1", "v2", "v1", "v3", "v2", "v3")  # Tres aristas (triángulo completo)
+)
+
+
+# Los convertimos en grafos para tener los estados triadicos no dirigidos
+
+for (i in 1:length(edgelists)) {
+  edgelists[[i]] <- graph(edgelists[[i]],directed = F)
+}
+
+edgelists[[1]] <- make_empty_graph(n = 3, directed = FALSE)
+V(edgelists[[1]])$name <- vertices
+
+# Los graficamos
+
+par(mfrow=c(3,3))
+for (i in edgelists) {
+  plot(i, main = sprintf('Grafo con %d aristas', ecount(i)))
+}
+
+# Valoremos ahora cuales de estos grafos son isomorfos
+
+# Mostremos cuales de estos grafos son isomorfos
+
+prueba_isomorfismo <- list()
+for (i in 1:(length(edgelists) - 1)) {
+  for (j in (i + 1):length(edgelists)) {
+    iso <- isomorphic(edgelists[[i]], edgelists[[j]])
+    if(iso == T){
+    cat(sprintf("Grafo %d y Grafo %d son isomorfos: %s\n", i, j, iso), "\n")}
+  }
+} 
+
+# Punto 6 -----------------------------------------------------------------
+
+
+
