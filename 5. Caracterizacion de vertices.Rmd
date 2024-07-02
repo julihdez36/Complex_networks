@@ -10,7 +10,7 @@ Las preguntas de interés se pueden formular en términos de algún aspecto de l
 - Flujo de la información.
 - Formación de comunidades.
 
-Lo primero que haremos para caracterizar el vértice es evaluar el grado de un vértice.
+Lo primero que haremos para caracterizar la red es la revisión de los individuos, esto es, realizar una análisis de los vértices, para lo cual introduciremos la noción de grado de un vértice.
 
 El **grado** (*degree*) $d_v$ de un vértice $v\in V$ se define como $d_v = |\left\{\{v,u\}\in E:u\in V \right\}|$, i.e., $d_v$ corresponde al número de aristas incidentes en $v$. 
 
@@ -20,13 +20,13 @@ $$
 d_i = \sum_{i:i\neq j} y_{i,j} = \sum_{j:j \neq i} y_{i,j}\,,\qquad \text{para}\,\,i=1,\ldots,n\,.
 $$
 
-El grado de un vértice es la combinación de la **sociabilidad** y la **popularidad**.
-
 En redes ponderadas, la **fuerza** (*strength*) $s_v$ de un vértice $v\in V$ se define como 
 $$
 s_v = \sum_{u\in V:\{v,u\}\in E} w_{\{v,u\}}\,,
 $$
 i.e., la suma de los pesos de las aristas incidentes en $v$. 
+
+Nótese que ll grado de un vértice es la combinación de la **sociabilidad** y la **popularidad** de cáda vértice.
 
 # Distribución del grado
 
