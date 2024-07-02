@@ -38,13 +38,107 @@ Usualmente esta distribución tiene un **sesgo positivo** o decaimiento, lo que 
 
 Si estoy trabajando con una red dirigida debemos definir dos distirbuciones de frecuencia, *in* y *out*. En estos casos, podemos realizar un *gráfico de dispersión* *(out,in)* que nos arroja información valiosa. 
 
-Para redes ponderadas hacemos uso de la **distribución de fuerza** (strenght distribution), la cual se define de manera análoga.
+Para redes ponderadas hacemos uso de la **distribución de fuerza** (strenght distribution), la cual se define de manera análoga. Revisemos algunas aplicaciones
 
 # Aplicaciones
 
-# Ejemplo Zachary.
-# Los nodos representan a los miembros de un club de karate 
-# Los enlaces indican interacciones sociales entre los miembros
+# 1. Game of thrones
+
+Red de interacciones de personajes de la temporada 1 de la serie de HBO juego de tronos. 
+
+```{r}
+url_edges <- 'https://raw.githubusercontent.com/julihdez36/Complex_networks/main/Data/got-s1-edges.csv'
+url_nodes <- 'https://raw.githubusercontent.com/julihdez36/Complex_networks/main/Data/got-s1-nodes.csv'
+
+df_edges <- read.csv(url_edges)
+df_nodes <- read.csv(url_nodes)
+```
+
+Procedemoa a definir el gráfo, definiendo los pesos de las conexiones entre los vértices (lo que viene en el df eges)
+
+```{r}
+suppressMessages(suppressWarnings(library(igraph)))
+
+got <- graph_from_data_frame(d = df_edges[,c(1,2)], vertices = df_nodes$Id, directed = "F") 
+E(got)$weight <- df_edges$Weight
+
+```
+
+Revisemos sus caracteristicas, lo que supone revisar su orden y tamaño
+
+```{r}
+ecount(got) # Orden del gráfo
+vcount(got) # Tamaño del gráfo
+```
+También indagamos si es dirigida o ponderada
+
+```{r}
+
+sprintf('Es dirigida la red: %s', is_directed(got))
+sprintf('Es ponderada la red: %s', is_weighted(got))
+
+```
+Construiremos la matriz de adyacencia para valorar los grados de la matriz siguiendo la definición que establecimos anteriormente. Para ello usamos primero la función *degree*, y al lado mostraremos la suma de las filas y de las columnas.
+
+```{r}
+# Matriz de adyacencia
+Y <- as_adjacency_matrix(got,sparse = F)
+
+# Grado
+
+head(
+  cbind(
+    degree(graph = got),
+    apply(X = Y, MARGIN = 1, FUN = sum),
+    apply(X = Y, MARGIN = 2, FUN = sum)), n = 5
+)
+
+```
+
+Habiendo mostrado nuestra definición anterior, podemos ver los personajes con mas relaciones
+
+```{r}
+# grado
+d <- degree(graph = got)
+head(sort(d, decreasing = T), n = 10)
+```
+Si añadimos la fuerza de las relaciones podemos valorar si hubo cambios significativos o no en los grados de los vértices
+
+```{r}
+# fuerza
+wd <- strength(got)
+head(sort(wd, decreasing = T), n = 10)
+```
+Con esto podemos proceder a diseñar las redes de las relaciones
+
+```{r}
+set.seed(123)
+l <- layout_with_dh(got)
+
+# visualización
+par(mfrow = c(1,2))
+# usando el grado
+plot(got, layout = l, vertex.size = 1.5*sqrt(d), vertex.label = NA, vertex.color = adjustcolor("royalblue",0.2), vertex.frame.color = "royalblue", edge.color = adjustcolor("gray",0.4))
+title(sub = "Grado", line = -1)
+# usando la fuerza
+plot(got, layout = l, vertex.size = 0.3*sqrt(wd), vertex.label = NA, vertex.color = adjustcolor("royalblue",0.2), vertex.frame.color = "royalblue", edge.color = adjustcolor("gray",0.4))
+title(sub = "Fuerza", line = -1)
+# title(main = "Juego de Tronos: Temporada 1 ", outer = T, line = -2)
+```
+Veamos la distribución de grado de nuestor grado. Acá se verifica que la dsitirbución tiene una asimetría positiva o decaimiento. Este hecho resulta importantísimo al ser un hecho recurrente en las distribuciones de grado.
+
+```{r}
+par(mfrow = c(1,2))
+hist(d, main = '')
+barplot(table(d))
+title(main = "Distribución del grado", outer = T, line = -2)
+
+```
+# 2. Ejemplo Zachary.
+
+Red de interacciones sociales entre los miembros de un club de karate. Estos datos fueron recolectados para estudiar la fragmentación que sufrió el club en dos clubes diferentes debido a una disputa entre el director y el administrador.
+
+Empecemos por valorar la información general de la red
 
 ```{r}
 suppressMessages(suppressWarnings(library(sand)))
@@ -57,20 +151,28 @@ ecount(karate) # Tamaño
 is_directed(karate) # No es dirigida
 is_weighted(karate) # Es ponderada (importancia relativa entre alumnos y lideres de la escuela)
 ```
-Con esta información general, revisemos los grados y grafiquemos la *distribución del grado*
-
-
+Con esta información en mente podemos visualizar nuestor gráfico. El gréfico por defecto colorea los nodos de cada uno de los equipos.
 ```{r}
-n <- vcount(karate)
-d <- degree(karate)
-
-par(mfrow = c(1,2))
-plot(table(factor(d,levels = 0:n))/n, lwd = 4, ylim = c(0,0.5),xlab = 'Grado',ylab = 'Densidad',xaxt = 'n', col = 'gray50')
-hist(d, freq = F, col = 'gray90',border = 'gray50')
-
-title(main = 'Distribución de grado', outer = T, line = -2)
+set.seed(123)
+plot(karate, layout = layout_with_dh, vertex.size = 10, vertex.frame.color = "black", vertex.label.color = "black", main = "Interacciones sociales")
 ```
 
+Con esta información general, revisemos los grados y grafiquemos la *distribución del grado*
+
+```{r}
+(n <- vcount(karate)) #Orden 
+(d <- degree(karate)) # Grado
+```
+Veamos ahora la distribución de grado de nuestra red
+```{r}
+
+par(mfrow = c(1,2))
+plot(table(factor(d, levels = 0:n))/n, type = "h", lwd = 5, ylim = c(0,0.5), xlab = "Grado", ylab = "Densidad", main = "", xaxt = "n", col = "gray50")
+axis(side = 1, at = seq(from = 0, to = 35, by = 5))
+plot(NA, NA, type = "n", xlim = c(0,35), ylim = c(0,0.5), xlab = "Grado", ylab = "Densidad", main = "")
+hist(d, freq = F, col = "gray90", border = "gray50", add = T)
+title(main = "Distribución del grado", outer = T, line = -2)
+```
 La asimetría positiva se ve reflejada en la distirbución de grado de nuestro ejemplo. También es posible ver que no hay nodos aislados (no hay vertices con grado 0). TAmpobo hay ninguno que tenga una conectividad total. También es posible ver que hay como tres categorías de grupos: (1) entre 16 y 17, (2) entre 9 y 13, (3) entre 1 y 6.
 
 Dado que esta red es ponderada, podriamos ajustar el gráfico por las ponderaciones
@@ -81,6 +183,41 @@ wd <- strength(karate)
 barplot(table(wd), xlim = c(0,35))
 hist(wd, freq = F)
 ```
+
+## Ley de potencias
+
+En algunas redes se tiene que una gran porción de vértices tiene grado bajo y una pequeña fracción tiene grado alto. Esta pequeña fracción de vértices se conoce como **centros** (*hubs*).
+
+En estos casos la distribución del grado tiene una **cola larga a la derecha**. Esto se traduce en un **decaimiento aproximadamente lineal** en la frecuencia logarítmica en función del grado logarítmico. 
+
+La **distribución de la ley de potencias** (*power law distribution*) señala que la distribución del grado $d$ es de la forma
+$$
+f_d = \mathrm{c}\,d^{-\alpha}\,,\qquad \mathrm{c}>0\,,\qquad \alpha>1\,,
+$$
+lo que en escala log corresponde a
+$$
+\log f_d = \log \mathrm{c} - \alpha\log d\,.
+$$
+$\mathrm{c}$ se denomina constante de normalización y $\alpha$ exponente de la ley de potencias (similar a la **distribución de Pareto**).
+
+Las redes que satisfacen este tipo de distribución del grado se denominan **libres de escala** (*scale free*) dado que
+$$
+f_{a\,d} =  \mathrm{c}\, (a\,d)^{-\alpha} = a^{-\alpha}\,f_d\,.
+$$
+En una red libre de escala, algunos nodos están altamente conectados, es decir, poseen un gran número de enlaces a otros nodos, aunque el grado de conexión de casi todos los nodos es bastante bajo.
+
+
+Cómo puede apreciarse, a escala logaritmica el decaimiento aproximadamente lineal se hace visible
+
+```{r}
+dk <- degree(karate)
+ddk <- degree_distribution(karate)
+par(mfrow = c(1,2))
+plot(dk,pch = 16,log = "xy")
+plot((0:max(dk))[ddk != 0], ddk[ddk != 0], log = "xy",pch = 16)
+
+```
+
 
 # EJemplo 2: Yeast
 # interacciones entre poteinas que tienen una confianza alta y media.
@@ -104,11 +241,27 @@ d <- degree(yeast)
 dd <- degree_distribution(yeast)
 
 # Gráfico
-par(mfrow = c(1,2))
-hist(d, freq = F)
-plot(log(dd))
+plot((0:max(d))[dd != 0], dd[dd != 0], log = "xy", pch = 16, col = adjustcolor("royalblue", 0.5), xlab = "Log-grado", ylab = "Log-densidad", main = "Distribución de grado (log-log)")
+
+
+
 ```
 Power low distribution. Refiere al comportamiento logaritmico de la función de densidad de masa de la dsitribución del grado.
 Cuando sigue este comportamiento la red sigue un comportamiento 'scale free'. La importancia de regularizar esta distribución del grado tiene que ver con que es un patrón muy común en los fenómenos analizados. 
 
 Lo que estamos viendo es que en escala logaritmica la densidad del grado es linealmente decreciente. 
+
+# grado promedio de los vecinos (GPV)
+
+Además de la distribución de grado de los vértices e sposible analizar el grado promedio de los vecinos (GPV)más cercanos de orden 1
+
+```{r}
+mnd <- knn(graph = yeast, vids = V(yeast))$knn
+mean(d[as.numeric(neighbors(graph = yeast, v = 1))])
+
+# visualización: GPV vs. grado
+plot(x = d, y = mnd, log = "xy", pch = 16, col = adjustcolor("yellow3", 0.5), xlab = "Log-grado", ylab = "Log-grado promedio de los vecinos")
+```
+Los vértices de grados superiores tienden a vincularse con vértices similares en este sentido.
+
+Mientras que los vértices de grados inferiores tienden a relacionarse tanto con vértices de grados inferiores como superiores.
