@@ -25,6 +25,7 @@ max(degree_distribution(yeast))
 dd <- degree_distribution(yeast)
 
 # Gráfico
+windows()
 plot((0:max(d))[dd != 0], dd[dd != 0], log = "xy", pch = 16, col = adjustcolor("royalblue", 0.5),
      xlab = "Log-grado", ylab = "Log-densidad", main = "Distribución de grado (log-log)")
 
@@ -40,6 +41,14 @@ plot(x = d, y = mnd, log = "xy", pch = 16, col = adjustcolor("yellow3", 0.5),
 
 # Las medidas de centralidad permiten cuantificar la noción de importancia 
 # de los nodos de una red
+
+# Un nodo se considera importante si se encuentra entr otros pares de vértices
+
+
+
+
+
+
 
 # Centralidad de cercania (closeness centrality)
 
