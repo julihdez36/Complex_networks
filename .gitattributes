@@ -2,6 +2,6 @@
 * text=auto
 
 *.Rmd linguist-language=R
-*.html linguist-language=latex
+*.html linguist-language=html
 
 
