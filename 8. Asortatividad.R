@@ -57,15 +57,19 @@ v.types[is.na(v.types)] <- 1
 table(v.types)
 
 # Veamos si la clase motiva o no la homofilia con la
-# asortatividad nominal
+# asortatividad nominal, la cual requiere variables cualitativas
 
 assortativity_nominal(graph = yeast, types = v.types, directed = F)
 
 # 0.5232879, lo que indica que la clase si motiva la homofilia
 
-# asortatividad grado
-assortativity_degree(yeast) # 0.4610798
+# Si queremos valorara la asortatividad para variables cuantitativas
+# comunmente la caracteristica continua se toma como el grado
 
+assortativity_degree(yeast) # 0.4610798 
+
+# esto significa que nodos populares tienden a relacionarse con nodos populares
+# en caso contrario, se diría que nodos populares se conectan con datos no populares
 
 # Interacciones sociales --------------------------------------------------
 
@@ -95,4 +99,41 @@ assortativity_nominal(graph = karate, types = v.types, directed = F)
 
 # asortatividad grado
 assortativity_degree(karate) # -0.4756131
+
+# Acá el coeficiente al ser negativo se puede inferir que la asortatividad
+# no se relaciona tanto con la popularidad, sino con la pertenencia a un grupo
+
+# Los modelos que construyamos deberían coincidir con esta información 
+
+# Ejemplo Lazega ----------------------------------------------------------
+
+library(sand)
+
+# datos
+lazega <- graph_from_data_frame(d = elist.lazega, directed = "F", vertices = v.attr.lazega)
+V(lazega)$label <- sub("V", "", V(lazega)$name)
+
+vcount(lazega) # orden 36
+
+ecount(lazega) # tamaño 115
+
+# asortatividad nominal a nivel de la sede de la oficina 
+# Recordemos que esto es estadistica descriptiva, no estamos haciendo inferencia
+
+assortativity(graph = lazega, types1 = V(lazega)$Office) #.282
+# No tiene una incidencia muy marcada en la generación de relaciones
+
+assortativity(graph = lazega, types1 = V(lazega)$Practice) #.2409
+
+assortativity(graph = lazega, types1 = V(lazega)$School) # -0.06
+
+# Asrotatividad continua
+
+assortativity(graph = lazega, types1 = V(lazega)$Years) # -0.07
+
+# asortatividad grado (dos formas)
+
+assortativity(graph = lazega, types1 = degree(lazega)) # -0.168
+assortativity_degree(graph = lazega, directed = F)
+
 
