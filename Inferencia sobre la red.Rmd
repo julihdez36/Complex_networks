@@ -1,0 +1,101 @@
+---
+title: "Inferencia de topología de red"
+output: html_document
+date: "2024-07-14"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introducción
+
+1. Predicción de enlaces dados los vértices y el conocimiento de algunas aristas
+2. Predicción de enlaces dados los vértices y sus caracteristicas
+3. Predicción de enlaces dados algunos vértices y sus características
+
+## Predicción de enlaces
+
+Y: matriz de adyacencia de $nxn$ asociado con una red $G = (V,e)$
+x: atributos de vértices
+
+Algunas de las entradas de $Y$ están observadoas, $Y^{obs}$, mientras que las otras son faltantes o perdidas, $y^{miss}$.
+
+El objetivo es predecir (imputar) los enlaces perdidos en $y^{miss}$, dado que $Y^{obs} = y^{obs}$ y posiblemente $X=x$.
+
+Un supuesto común es que la información faltante sobre la presencia/ausencia de las aristas es *perdida al azar* (missin at random, MAR), esto significa que los datos perdidos se pueden explicar por medio de las variables donde si hay información completa.
+
+Para esto, tenemos dos alternativas:
+- Modelos 
+- Puntajes (scores)
+
+# Puntajes
+
+Para cada vértices $i$ y $j$ cuyo estado de enlaces es deconocido, se calcula un puntaje $s(i,j)$. Esto sería un número real. Acá no hay una estructura probabilistica por detrás. Simplemente e un criterio de selección de enlace. 
+
+Con este puntaje se calcula un umbral o un ranking que nos permite definir si la pareja de vértices está o no conectada.
+
+Se han propuesto muchos puntajes en la literatura. Los criterios mas usados en la litaratura son:
+
+**Negativos de distancia geodésica:**
+$$s(i,j) = -dis_{G}^{obs}(i,j)$$
+El signo negativo está presente para que los valores de puntuación más altos indiquen que es mas "probable" que los pares de vértices compartan una aristas. Entre mas grande es la distancia geodésica (la mas corta), dado que si hay conexiones observadas, mas lejanos estan y menor posibilidad de enlace tendrán. Por eso el valor negativo.
+
+**Comparación de las vecindades $N_i$ u $N_j$ de**
+
+$$s(i,j) = |N_{i}^{obs} \cap N_{i}^{obs}|$$
+
+Entre mas elementos en común tenas los indivicos, mas porbbailidad hay de que tengan relaciones entre los vértices. Se sigue el principio de asortatividad y homofilia.
+
+
+## Ejmeplo: blogs de política
+
+```{r}
+suppressMessages(suppressWarnings(library(igraph)))
+suppressMessages(suppressWarnings(library(sand)))
+suppressMessages(suppressWarnings(library(dplyr)))
+
+data(fblog)
+(n <- vcount(fblog)) #192
+(e <- ecount(fblog)) #1431
+A <- as.matrix(as_adjacency_matrix(fblog))
+colnames(A) <- rownames(A) <- rep("",n)
+```
+Comparación de vecindades
+
+```{r}
+ncn <- numeric()
+for(i in (1:(n-1))){
+  .ni <- ego(fblog, 1, i)
+  .nj <- ego(fblog, 1, (i+1):n)
+  .nbhd.ij <- mapply(intersect, .ni, .nj, SIMPLIFY=FALSE)
+  .temp <- unlist(lapply(.nbhd.ij, length)) -2*A[i, (i+1):n]
+  ncn <- c(ncn, .temp)
+}
+length(ncn) 
+
+```
+Visualizaciones... lueog lo hago. Acá el enlace
+
+https://rpubs.com/jstats1702/973010
+
+```{r}
+library(vioplot)
+library(ROCR)
+
+
+pred_ncn <- prediction(ncn, Avec)
+perf_ncn <- performance(pred_ncn, "auc")
+paste0('AUC=',slot(perf_ncn, "y.values"),sep='')
+```
+# Red de asociaciones min. 50
+Esto se conoce como **association networsk**
+
+- Medidas de asociación lineales comunes y populares son:
+correlación
+- correlación parcial
+- Modelo de asociación Gaussiano (caso particular de la correlación parcial)
+
+
+
+
