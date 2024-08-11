@@ -1,0 +1,104 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc} % codificación UTF-8
+\usepackage{apacite} % citación APA
+\usepackage[spanish]{babel} % Configuración de idioma
+\usepackage{amsmath} 
+\usepackage{natbib}
+\bibliographystyle{apa}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+\usepackage{setspace} % Para ajustar el espaciado
+\onehalfspacing % Aplica el espaciado de 1.5
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{mathptmx}  % Usa Times como fuente principal
+\usepackage{setspace}  % Paquete para controlar el espaciado entre líneas
+\usepackage{fancyhdr}
+
+
+\captionsetup[figure]{
+	format=plain,  % Formato estándar sin cursivas
+	justification=centering,  % Centrado del texto
+	labelsep=period,  % Separador de etiqueta con un punto
+	singlelinecheck=false,  % Permitir etiquetas en una sola línea
+	position=above  % Posicionar el título encima de la figura
+}
+
+% Configuración del encabezado
+\pagestyle{fancy}
+\fancyhf{} % Limpiar encabezado y pie de página
+\fancyhead[L]{\textsc{ENFOQUES SEMIPARAMÉTRICOS PARA INFERIR PROPIEDADES TOPOLÓGICAS EN REDES COMPLEJAS DE PRECIOS}} % Encabezado en la parte izquierda
+\renewcommand{\headrulewidth}{0.4pt} % Línea debajo del encabezado
+
+% Un nuevo enfoque para inferir propiedades topológicas en redes complejas de precios complejas
+\title{Enfoques semiparamétricos para inferir propiedades topológicas en redes complejas de precios}
+%\author{Julián López Hernández}
+\date{}
+
+\begin{document}
+
+\Large \textbf{Enfoques semiparamétricos para inferir propiedades topológicas en redes complejas de precios} \vspace{5mm}
+
+\begin{spacing}{0.9}
+{\small \textbf{Resumen:}
+	Se proponen dos enfoques semiparamétricos para modelar la dinámica de precios en una economía utilizando redes complejas no dirigidas. El primer enfoque estima una red de correlación en la que se controla la tasa de descubrimiento falso (FDR) mediante la implementación de metodologías de corrección no paramétrica \citep{kolaczyk2014statistical}. El segundo enfoque explora el uso de modelos gráficos de cópula gaussiana semiparamétrica \citep{liu2012high}. Ambas aproximaciones enfrentan y superan eficientemente las limitaciones de las investigaciones precedentes consistentes en la estimación de redes correccionales con umbral. Los métodos propuestos se aplican al conjunto de datos del IPC de Estados Unidos y se modelan haciendo uso de los paquetes \textit{igraph} y \textit{huge} de R.} \vspace{5mm}
+\end{spacing}
+	
+\large \textbf{Problema de investigación: redes de correlación con umbral} 
+
+	Los esfuerzos por modelar el sistema de precios como un sistema complejo exige una tarea de inferencia estadística que puede resumirse de la siguiente manera: dado un grafo $G = (V, E)$, se desea inferir el conjunto de aristas $E$ a partir de un vector $X_{i}$ de $m$ atributos observados para cada vértice $v_{i} \in V$.  
+	
+	Los trabajos de \citet{gao2013features} y \citet{sarantitis2018network}, pioneros en este área, proponen construir una red de correlación donde el grado de similaridad entre dos bienes $sim(i,j) \ \forall \ i,j \in V$ se cuantifique a través del \textit{coeficiente de correlación lineal punto-momento de Pearson}, $\hat{\rho}_{i,j}$. Dado que se trata de un coeficiente continuo entre el intervalo $[-1, 1]$, surge la necesidad de establecer un criterio de selección de enlaces que controle la densidad de la red evitando las correlaciones espurias, lo cual se resuelve a través del establecimiento de un umbral mínimo $u$, por lo que $E$ queda definido como: $E = \{\{i,j\} \in V: \  |\hat{\rho}_{i,j}| \ >   \ u \ \}$.
+	
+	\begin{figure}[h!]
+		\centering
+		\caption{Redes de correlación con umbral [IPC de Estados Unidos 2012-2023]}  % Título encima de la figura
+		\includegraphics[width=\linewidth]{grafos_umbral.eps}
+		\captionsetup{justification=justified, singlelinecheck=false}
+		\caption*{Fuente: The Bureau of Labor Statistics (BLS).}  % Fuente o descripción debajo de la figura
+		\label{fig:GrafosConUmbral}
+	\end{figure}
+	
+	Este enfoque, hasta ahora dominante en las estimaciones de redes de precios, deja a discreción de los investigadores la definición del nivel del umbral, restando consistencia y reproducibilidad a los resultados del ejercicio de inferencia. La relevancia del umbral en la estructuración de la red se ilustra en la Figura \ref{fig:GrafosConUmbral} en la que se estiman propiedades topológicas usando los umbrales definidos por \citet{alvarez2021dinamica} y \citet{sarantitis2018network}. \vspace{5mm}
+	
+\textbf{Metodología y conclusiones:}
+	
+	La presente investigación sugiere que con un tratamiento adecuado de la medida de similaridad es posible construir una red dispersa que minimice la presencia de correlaciones espurias, por lo que se opta por dos aproximaciones semiparamétricas al constatar que el supuesto de normalidad exigido no se satisface.
+	
+	En el primer caso se construye un grafo de correlación bajo un sistema de hipótesis convencional ($H_{0}: \hat{\rho} = 0  \ \  vs.  \  \ H_{1}: \hat{\rho} \neq 0$), sobre el cual se realiza una corrección no paramétrica para controlar la tasa de falso descubrimiento (FDR). 
+	
+	En el segundo caso, se toma como base los modelos gráficos gaussianos, que exigen el supuesto de normalidad multivariada, el cual se ajusta haciendo uso de funciones cópula que permiten una estimación no-paranormal \citep{liu2009nonparanormal}. El modelo gaussiano se estimó con el método de regularización \textit{Lasso} para luego seleccionar el lambda óptimo usando el criterio de estabilidad \textit{stars}. La siguiente tabla muestra las conexiones inferidas (1) por cada método. Los grafos se aprecian en el gráfico \ref{fig:Grafossemipara}. 
+	\
+	\begin{table}[ht]
+		\centering
+		\begin{tabular}{rrr}
+			\hline
+			& edges\_copula: 0 & edges\_copula: 1 \\ 
+			\hline
+			edges\_fdr: 0 & 15098 &  82 \\ 
+			edges\_fdr: 1 &  94 & 302 \\ 
+			\hline
+		\end{tabular}
+	\end{table}
+	 
+	\begin{figure}[h!]
+		\centering
+		\caption{Redes de correlación con ajuste semiparamétrico [IPC de Estados Unidos 2012-2023]}  % Título encima de la figura
+		\includegraphics[width=\linewidth]{grafos_semiparametricos.eps}
+		\captionsetup{justification=justified, singlelinecheck=false}
+		\caption*{Fuente: The Bureau of Labor Statistics (BLS).}  % Fuente o descripción debajo de la figura
+		\label{fig:Grafossemipara}
+	\end{figure}
+	
+	
+\newpage
+		 
+		 
+\nocite{*}
+
+\bibliography{bibliografia}
+
+
+
+
+\end{document}
