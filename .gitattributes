@@ -3,5 +3,8 @@
 
 *.Rmd linguist-language= R
 *.html linguist-language= R
+*.RData linguist-language= R
+*.csv linguist-language= R
+
 
 
