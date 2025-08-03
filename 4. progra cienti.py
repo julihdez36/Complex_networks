@@ -26,7 +26,11 @@ def approachWallis(n):
     return 2 * math.prod(serie)
 
 approachWallis(1000)
-    
+approachLeibniz(1000)
+
+print('Serie \t \t n = 100 \t n=1000 \t n=10000')
+print('Leibniz \t %f \t %f \t %f'%(approachLeibniz(100),approachLeibniz(1000),approachLeibniz(10000)))
+print('Wallis \t \t %f \t %f \t %f'%(approachWallis(100),approachWallis(1000),approachWallis(10000)))
 
 # Qué serie converge mas rápido?
 
